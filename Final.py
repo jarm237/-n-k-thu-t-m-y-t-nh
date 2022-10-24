@@ -1,14 +1,14 @@
-from typing import overload
+# from typing import overload
 import cv2
 import numpy as np
 import os
 import HandTrackingModule as htm
-from playsound import playsound
-import pytesseract
-from datetime import datetime
+# from playsound import playsound
+# import pytesseract
+# from datetime import datetime
 import colorama
-from colorama import Fore, Back, Style
-colorama.init(autoreset=True)
+# from colorama import Fore, Back, Style
+# colorama.init(autoreset=True)
 
 RED = '\033[31m'
 GREEN = '\033[32m'
@@ -24,6 +24,7 @@ myList = os.listdir(folderPath)
 #print(myList)
 count = 0
 mode = 0
+drawMode = 0
 overlayList = []
 #Save image in folderPath to overlayList
 for imPath in myList:
@@ -33,6 +34,7 @@ for imPath in myList:
 
 #Setting background
 header = overlayList[0]
+footer = overlayList[4]
 
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 #Width = 1280
@@ -62,6 +64,9 @@ while True:
 
     img = cv2.bitwise_and(img, imgInv)
     img = cv2.bitwise_or(img, imgCanvas)
+    #img is camera
+    #imgCanvas background black and color pink
+    #imgInv background white and color black
 
     if len(lmList)!=0:
         #print(lmList)
@@ -77,23 +82,83 @@ while True:
 
         #Drawing Mode
         if finger[1]==True and finger[2]==False:
-            cv2.circle(img, (x1,y1), 15, drawColor, cv2.FILLED)
+            cv2.circle(img, (x1, y1), 15, drawColor, cv2.FILLED)
             #print("Drawing Mode")
             if x0 == 0 and y0 == 0:
                 x0, y0 = x1, y1
             #Draw & Eraser line in img:
-            if mode == 2:
-                cv2.line(img, (x0, y0), (x1, y1), drawColor, eraser)
-                cv2.line(imgCanvas, (x0, y0), (x1, y1), drawColor, eraser)
-            elif mode == 1:
-                cv2.line(img, (x0, y0), (x1, y1), drawColor, brush)
-                cv2.line(imgCanvas, (x0, y0), (x1, y1), drawColor, brush)
+            if mode and drawMode == 0:
+                if mode == 2:
+                    cv2.line(img, (x0, y0), (x1, y1), drawColor, eraser)
+                    cv2.line(imgCanvas, (x0, y0), (x1, y1), drawColor, eraser)
+                elif mode == 1:
+                    cv2.line(img, (x0, y0), (x1, y1), drawColor, brush)
+                    cv2.line(imgCanvas, (x0, y0), (x1, y1), drawColor, brush)
+                x0, y0 = x1, y1
 
-            #mode 3: draw a line
-            # elif mode == 3:
+            #Draw mode
+            if drawMode != 0:
+                imgCanvas = np.zeros((720, 1280, 3), np.uint8)
 
+                # Line
+                if drawMode == 1:
+                    cv2.line(img, (x0, y0), (x1, y1), drawColor, brush)
+                    cv2.line(imgCanvas, (x0, y0), (x1, y1), drawColor, brush)
 
-            x0, y0 = x1, y1
+                # Triangle
+                elif drawMode == 2:
+                    pt1 = (int((x0 + x1)/2), y0)
+                    pt2 = (x0, y1)
+                    pt3 = (x1, y1)
+
+                    cv2.line(img, pt1, pt2, drawColor, brush)
+                    cv2.line(img, pt2, pt3, drawColor, brush)
+                    cv2.line(img, pt3, pt1, drawColor, brush)
+                    cv2.line(imgCanvas, pt1, pt2, drawColor, brush)
+                    cv2.line(imgCanvas, pt2, pt3, drawColor, brush)
+                    cv2.line(imgCanvas, pt3, pt1, drawColor, brush)
+
+                # Rectangle
+                elif drawMode == 3:
+                    cv2.rectangle(img, (x0, y0), (x1, y1), drawColor, brush)
+                    cv2.rectangle(imgCanvas, (x0, y0), (x1, y1), drawColor, brush)
+
+                # Circle
+                elif drawMode == 4:
+                    if abs(x1 - x0) > abs(y1 - y0):
+                        radius = int(abs(y1 - y0)/2)
+                        if y1 > y0 and x1 > x0:
+                            cv2.circle(img, ((x0 + radius), (y0 + radius)), radius, drawColor, brush)
+                            cv2.circle(imgCanvas, ((x0 + radius), (y0 + radius)), radius, drawColor, brush)
+                        elif y1 > y0 and x1 < x0:
+                            cv2.circle(img, ((x1 + radius), (y0 + radius)), radius, drawColor, brush)
+                            cv2.circle(imgCanvas, ((x1 + radius), (y0 + radius)), radius, drawColor, brush)
+                        elif y1 < y0 and x1 > x0:
+                            cv2.circle(img, ((x0 + radius), (y1 + radius)), radius, drawColor, brush)
+                            cv2.circle(imgCanvas, ((x0 + radius), (y1 + radius)), radius, drawColor, brush)
+                        else:
+                            cv2.circle(img, ((x1 + radius), (y1 + radius)), radius, drawColor, brush)
+                            cv2.circle(imgCanvas, ((x1 + radius), (y1 + radius)), radius, drawColor, brush)
+
+                    else:
+                        radius = int(abs(x1 - x0)/2)
+                        if y1 > y0 and x1 > x0:
+                            cv2.circle(img, ((x0 + radius), (y0 + radius)), radius, drawColor, brush)
+                            cv2.circle(imgCanvas, ((x0 + radius), (y0 + radius)), radius, drawColor, brush)
+                        elif y1 > y0 and x1 < x0:
+                            cv2.circle(img, ((x1 + radius), (y0 + radius)), radius, drawColor, brush)
+                            cv2.circle(imgCanvas, ((x1 + radius), (y0 + radius)), radius, drawColor, brush)
+                        elif y1 < y0 and x1 > x0:
+                            cv2.circle(img, ((x0 + radius), (y1 + radius)), radius, drawColor, brush)
+                            cv2.circle(imgCanvas, ((x0 + radius), (y1 + radius)), radius, drawColor, brush)
+                        else:
+                            cv2.circle(img, ((x1 + radius), (y1 + radius)), radius, drawColor, brush)
+                            cv2.circle(imgCanvas, ((x1 + radius), (y1 + radius)), radius, drawColor, brush)
+
+            # x0, y0 = x1, y1
+
+        # n = n + 1
+        # print(n)
 
         #Selecting Mode
         if finger[1] and finger[2]:
@@ -102,13 +167,8 @@ while True:
             if 0 < y1 < 115: 
                 if 237 < x1 < 352: 
                     header = overlayList[1]
-                    drawColor = (255, 0, 255) 
-                    mode = 1
-
-                #add later
-                elif 0 < x1 < 237:
                     drawColor = (255, 0, 255)
-                    mode = 3
+                    mode = 1
 
                 elif 467 < x1 < 582: 
                     header = overlayList[2]
@@ -125,7 +185,30 @@ while True:
                     img_r = 'Fail/fail_record.png'
                     cv2.imwrite(pw_r, imgInv)
                     break
-                    #Export passwork screen to file png
+                    #Export password screen to file png
+
+            if mode == 1:
+                img[605:720, 0:1280] = footer
+                if 605 < y1 < 720:
+                    if 237 < x1 < 352:
+                        footer = overlayList[5]
+                        drawColor = (255, 0, 255)
+                        drawMode = 1  # Line
+
+                    elif 467 < x1 < 582:
+                        footer = overlayList[6]
+                        drawColor = (255, 0, 255)
+                        drawMode = 2  # Triangle
+
+                    elif 697 < x1 < 812:
+                        footer = overlayList[7]
+                        drawColor = (255, 0, 255)
+                        drawMode = 3  # Rectangle
+
+                    elif 927 < x1 < 1042:
+                        footer = overlayList[8]
+                        drawColor = (255, 0, 255)
+                        drawMode = 4  # Circle
             
             cv2.rectangle(img, (x1, y1 - 25), (x2, y2 + 25), drawColor, cv2.FILLED)
 
@@ -139,37 +222,7 @@ while True:
 cv2.destroyAllWindows()
 #print(image_text)
 from read_img import image_text
-with open("PassLog/setpw.txt", 'r' , encoding='utf-8') as f:
-    setpw = f.read(4)
-with open("PassLog/enterpw.txt", 'w' , encoding='utf-8') as f:
-    f.write(image_text[:4])
-with open("PassLog/enterpw.txt", 'r' , encoding='utf-8') as f:
-    enterpw = f.read(4)
 
 print(image_text)
 
-#print(enterpw)
-
-# # Print the time and the access history of the door
-# now = datetime.now()
-# dt = now.strftime("%d/%m/%Y %H:%M:%S")
-# # from Bot_Telegram import bot_message, bot_photo
-# if setpw == enterpw:
-#     print(GREEN + "Welcome home, sir! (^.^)")
-#     playsound(f'Audio/success.mp3')
-#     with open("PassLog/Log.txt", 'w+' , encoding='utf-8') as f:
-#         #f.seek(0,0)
-#         #f.writelines(enterpw + '\n')
-#         f.writelines(dt + " - The door is opened!" + '\n' + '\n')
-#     os.remove('Image/password_record.png')
-# else:
-#     print(RED + "Wrong password, please try again!")
-#     playsound(f'Audio/fail.mp3')
-#     cv2.imwrite('Fail/fail_record.png', img)
-#     with open("PassLog/Log.txt", 'w+' , encoding='utf-8') as f:
-#         #f.write(enterpw + '\n')
-#         f.writelines(dt + " - Access denied!" + '\n' + '\n')
-#     # bot_photo()
-# # bot_message()
-# keys = cv2.waitKey(1)
 
