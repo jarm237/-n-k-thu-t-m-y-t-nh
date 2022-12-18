@@ -50,17 +50,26 @@
     <h1>Simple roslib Example</h1>
     <p>Check your Web Console for output.</p>
     <?php
+        $flag = 0;
         if(!empty($_POST['image'])){
             if(file_put_contents(date("d-m-Y").'-'.time().'-'.rand(10000,100000).'.jpg',
             base64_decode($_POST['image']))){
                 echo 'success';
-                echo '<script type="text/javascript">',
-                        'Send_data()',
-                        '</script>';
+                $flag = 1;
             }
             else echo 'Fail';
         }
         else echo 'No image';
+        if ($flag) {
+            echo $flag;
+            $command = escapeshellcmd('read_img.py');
+            $output = shell_exec($command);
+            // Test output of python
+            echo $output;
+            echo '<script type="text/javascript">',
+                'Publish_data()',
+                '</script>';
+        }
     ?>
     
   </body>
