@@ -8,9 +8,9 @@ def Find_coordinate():
 
     # Reading image
     # img2 = cv2.imread('images/rectangle2.jpg', cv2.IMREAD_COLOR)
-    img = cv2.imread('image.jpg',  cv2.IMREAD_COLOR)
+    img = cv2.imread('images/image.jpg',  cv2.IMREAD_COLOR)
 
-    imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Converting image to a binary image
     # ( black and white only image).
@@ -57,6 +57,7 @@ def Find_coordinate():
 
     return coordinate
 
+Find_coordinate()
 # Showing the final image.
 # print('coordinate', coordinate)
 # img = cv2.resize(img, (634, 936), interpolation=cv2.INTER_AREA)
