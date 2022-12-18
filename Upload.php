@@ -52,7 +52,7 @@
     <?php
         $flag = 0;
         if(!empty($_POST['image'])){
-            if(file_put_contents(date("d-m-Y").'-'.time().'-'.rand(10000,100000).'.jpg',
+            if(file_put_contents('image.jpg',
             base64_decode($_POST['image']))){
                 echo 'success';
                 $flag = 1;
