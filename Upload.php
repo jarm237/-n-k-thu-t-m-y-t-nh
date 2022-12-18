@@ -7,7 +7,7 @@
   <script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
 
   <script type="text/javascript">
-        function Publish_data() {
+        function Publish_data(data) {
             // Connecting to ROS
             // -----------------
             var ros = new ROSLIB.Ros({
@@ -36,9 +36,7 @@
             });
 
             var twist = new ROSLIB.Message({
-            shape: "circle",
-            center: "255, 255",
-            
+                data            
             });
             cmdVel.publish(twist);
         }
@@ -67,7 +65,7 @@
             // Test output of python
             echo $output;
             echo '<script type="text/javascript">',
-                'Publish_data()',
+                'Publish_data('. $output .')',
                 '</script>';
         }
     ?>
