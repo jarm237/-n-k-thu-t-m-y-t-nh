@@ -8,7 +8,7 @@ def Find_coordinate():
 
     # Reading image
     # img2 = cv2.imread('images/rectangle2.jpg', cv2.IMREAD_COLOR)
-    img = cv2.imread('images/image.jpg',  cv2.IMREAD_COLOR)
+    img = cv2.imread('images/316832360_562710995217932_5888738283202007937_n.jpg',  cv2.IMREAD_COLOR)
 
     # imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -29,7 +29,7 @@ def Find_coordinate():
     # Going through every contours found in the image.
     # for cnt in contours:
 
-    approx = cv2.approxPolyDP(contours[len(contours) - 1], 0.009 * cv2.arcLength(contours[len(contours) - 1], True), True)
+    approx = cv2.approxPolyDP(contours[len(contours) - 1], 0.05 * cv2.arcLength(contours[len(contours) - 1], True), True)
 
     # draws boundary of contours.
     cv2.drawContours(img, [approx], 0, (0, 0, 255), 5)
@@ -46,7 +46,8 @@ def Find_coordinate():
     #         y = n[i + 1]
     #         print('x ', x, ' y ', y)
     #     i = i + 1
-
+    # img = cv2.resize(img, (634, 936), interpolation=cv2.INTER_AREA)
+    # cv2.imshow('image2', img)
     if len(n) <= 12:
         coordinate = n
     else:
@@ -54,7 +55,7 @@ def Find_coordinate():
             if i < 12:
                 coordinate[i] = j
             i = i + 1
-
+    # print(coordinate)
     return coordinate
 
 Find_coordinate()
@@ -62,7 +63,7 @@ Find_coordinate()
 # print('coordinate', coordinate)
 # img = cv2.resize(img, (634, 936), interpolation=cv2.INTER_AREA)
 # imgEdge = cv2.resize(imgEdge, (634, 936), interpolation=cv2.INTER_AREA)
-# cv2.imshow('image2', img)
+
 
 # Exiting the window if 'q' is pressed on the keyboard.
-# cv2.waitKey(0)
+cv2.waitKey(0)
